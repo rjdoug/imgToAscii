@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	
 
 	"gopkg.in/gographics/imagick.v2/imagick"
 )
@@ -21,7 +22,7 @@ func main() {
 	width := mw.GetImageWidth()
 	fmt.Printf("Image size: %d x %d\n", width, height)
 
-	var imagePixels [480][640]float64
+	var imagePixels [480][640]int
 	//func (mw *MagickWand) GetImagePixelColor(x, y int) (color *PixelWand, err error)
 	for i := 0; i < int(height); i++ {
 		for j := 0; j < int(width); j++ {
@@ -59,6 +60,7 @@ func mapToRgb(color float64) float64 {
 }
 
 // Gets a brightness value for the current pixel
-func averageBrightness(r, g, b float64) float64 {
-	return (r + g + b) / 3
+func averageBrightness(r, g, b float64) int {
+	
+	return (int(r) + int(g) + int(b)) / 3
 }
