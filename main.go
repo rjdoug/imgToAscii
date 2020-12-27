@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
-	
+	"strings"
+	"math"
 
 	"gopkg.in/gographics/imagick.v2/imagick"
 )
@@ -12,8 +13,12 @@ func main() {
 	imagick.Initialize()
 	defer imagick.Terminate()
 
+	// Split asscii string. These are the characters from lightest to darkest
+	asciiString := "`^\",:;Il!i~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
+	characters := strings.Split(asciiString, "")
+
 	mw := imagick.NewMagickWand()
-	err := mw.ReadImage("car.jpg")
+	err := mw.ReadImage("smiley.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,7 +27,7 @@ func main() {
 	width := mw.GetImageWidth()
 	fmt.Printf("Image size: %d x %d\n", width, height)
 
-	var imagePixels [480][640]int
+	var imagePixels [10000][10000]int
 	//func (mw *MagickWand) GetImagePixelColor(x, y int) (color *PixelWand, err error)
 	for i := 0; i < int(height); i++ {
 		for j := 0; j < int(width); j++ {
@@ -31,28 +36,15 @@ func main() {
 				log.Fatal(err)
 			}
 			imagePixels[i][j] = averageBrightness(mapToRgb(pw.GetRed()), mapToRgb(pw.GetGreen()), mapToRgb(pw.GetBlue()))
-			println(imagePixels[i][j])
-			// fmt.Printf("Index: %d,%d\n", i,j)
-			// fmt.Printf("R: %f\nG: %f\nB: %f\n", mapToRgb(pw.GetRed()), mapToRgb(pw.GetGreen()), mapToRgb(pw.GetBlue()))
-			// fmt.Println()
+			asciiIndex := math.Floor(float64(imagePixels[i][j]) / 3.92)
+			fmt.Print(characters[int(asciiIndex)])
+			fmt.Print(characters[int(asciiIndex)])
+			fmt.Print(characters[int(asciiIndex)])
+			
 		}
+		fmt.Println("")
 	}
 	fmt.Println("DONE!")
-	// for i := 0; i < int(height); i++ {
-	// 	for j := 0; j < int(width); j++ {
-	// 		fmt.Printf("Index: %d,%d\n", i, j)
-	// 		fmt.Printf("R: %f\nG: %f\nB: %f\n", mapToRgb(imagePixels[i][j][0]), mapToRgb(imagePixels[i][j][1]), mapToRgb(imagePixels[i][j][2]))
-	// 		fmt.Println()
-	// 	}
-	// }
-
-	// 	cols, rows, err := mw.GetSize()
-	// 	if err != nil {
-	// 		log.Fatal(err)
-	// 	}
-
-	// 	fmt.Println(cols)
-	// 	fmt.Println(rows)
 }
 
 func mapToRgb(color float64) float64 {
@@ -64,3 +56,7 @@ func averageBrightness(r, g, b float64) int {
 	
 	return (int(r) + int(g) + int(b)) / 3
 }
+
+
+// Lightness: average the maximum and minimum values out of R, G and B - max(R, G, B) + min(R, G, B) / 2
+// Luminosity: take a weighted average of the R, G and B values to account for human perception - 0.21 R + 0.72 G + 0.07 B
