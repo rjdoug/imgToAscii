@@ -21,7 +21,7 @@ func main() {
 	width := mw.GetImageWidth()
 	fmt.Printf("Image size: %d x %d\n", width, height)
 
-	var imagePixels [480][640][3]float64
+	var imagePixels [480][640]float64
 	//func (mw *MagickWand) GetImagePixelColor(x, y int) (color *PixelWand, err error)
 	for i := 0; i < int(height); i++ {
 		for j := 0; j < int(width); j++ {
@@ -29,22 +29,21 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			imagePixels[i][j][0] = pw.GetRed()
-			imagePixels[i][j][1] = pw.GetGreen()
-			imagePixels[i][j][2] = pw.GetBlue()
+			imagePixels[i][j] = averageBrightness(mapToRgb(pw.GetRed()), mapToRgb(pw.GetGreen()), mapToRgb(pw.GetBlue()))
+			println(imagePixels[i][j])
 			// fmt.Printf("Index: %d,%d\n", i,j)
 			// fmt.Printf("R: %f\nG: %f\nB: %f\n", mapToRgb(pw.GetRed()), mapToRgb(pw.GetGreen()), mapToRgb(pw.GetBlue()))
 			// fmt.Println()
 		}
 	}
 	fmt.Println("DONE!")
-	for i := 0; i < int(height); i++ {
-		for j := 0; j < int(width); j++ {
-			fmt.Printf("Index: %d,%d\n", i, j)
-			fmt.Printf("R: %f\nG: %f\nB: %f\n", mapToRgb(imagePixels[i][j][0]), mapToRgb(imagePixels[i][j][1]), mapToRgb(imagePixels[i][j][2]))
-			fmt.Println()
-		}
-	}
+	// for i := 0; i < int(height); i++ {
+	// 	for j := 0; j < int(width); j++ {
+	// 		fmt.Printf("Index: %d,%d\n", i, j)
+	// 		fmt.Printf("R: %f\nG: %f\nB: %f\n", mapToRgb(imagePixels[i][j][0]), mapToRgb(imagePixels[i][j][1]), mapToRgb(imagePixels[i][j][2]))
+	// 		fmt.Println()
+	// 	}
+	// }
 
 	// 	cols, rows, err := mw.GetSize()
 	// 	if err != nil {
@@ -59,4 +58,7 @@ func mapToRgb(color float64) float64 {
 	return color * 255
 }
 
-
+// Gets a brightness value for the current pixel
+func averageBrightness(r, g, b float64) float64 {
+	return (r + g + b) / 3
+}
